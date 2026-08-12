@@ -12,9 +12,12 @@
 
 # testing
 /coverage
+# Local audio fixtures generated for manual end-to-end runs (macOS `say`).
+/public/*-test-fixture.*
 
 # next.js
 /.next/
+/.next-verify/
 /out/
 
 # production

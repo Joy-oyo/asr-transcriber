@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ───────────────────────────────────────────────────────────────
+   Neobrutalism — paper background, ink outlines, hard offset
+   shadows, and colour used as signal rather than decoration.
+   No gradients, no blur, no soft edges.
+   ─────────────────────────────────────────────────────────────── */
+@theme {
+  --color-paper: #fdf6e6;
+  --color-card: #fffdf7;
+  --color-ink: #131313;
+
+  /* Signal colours. Every one is dark-text-safe. */
+  --color-volt: #ffe14d;
+  --color-aqua: #6fe3f5;
+  --color-punch: #ff6b8b;
+  --color-mint: #9ef07a;
+  --color-tangerine: #ffa14a;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --animate-blink: blink 1s steps(2, start) infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes blink {
+  to {
+    visibility: hidden;
   }
 }
 
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  /* Faint engineering grid — keeps the flat fill from reading as empty. */
+  background-image:
+    linear-gradient(rgba(19, 19, 19, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19, 19, 19, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Core primitives
+   ─────────────────────────────────────────────────────────────── */
+
+/** Outlined surface. The border is the design; nothing is implied by shade. */
+@utility nb {
+  border: 3px solid var(--color-ink);
+  background-color: var(--color-card);
+}
+
+@utility nb-thin {
+  border: 2px solid var(--color-ink);
+  background-color: var(--color-card);
+}
+
+/* Hard offset shadows — no blur, no alpha. */
+@utility nb-shadow-sm {
+  box-shadow: 3px 3px 0 var(--color-ink);
+}
+
+@utility nb-shadow {
+  box-shadow: 5px 5px 0 var(--color-ink);
+}
+
+@utility nb-shadow-lg {
+  box-shadow: 8px 8px 0 var(--color-ink);
+}
+
+/**
+ * Physical press. The element travels into its own shadow, so the total
+ * silhouette stays put and only the gap collapses.
+ */
+@utility nb-press {
+  transition:
+    transform 0.1s ease-out,
+    box-shadow 0.1s ease-out;
+
+  &:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--color-ink);
+  }
+
+  &:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 var(--color-ink);
+  }
+
+  &:disabled {
+    box-shadow: 2px 2px 0 rgba(19, 19, 19, 0.35);
+  }
+}
+
+/* Keyboard focus has to beat a 3px black border, so it goes outside it. */
+:focus-visible {
+  outline: 3px solid var(--color-punch);
+  outline-offset: 3px;
+}
+
+/*
+ * The wizard step region is a programmatic focus target, not a control. Focus
+ * lands there so screen readers announce the new step, but the whole panel
+ * swapping is signal enough on screen — an outline around it only adds noise.
+ */
+.step-region:focus-visible {
+  outline: none;
+}
+
+::selection {
+  color: var(--color-ink);
+  background: var(--color-volt);
+}
+
+/* Native form controls, brutalised. */
+select,
+input[type="checkbox"] {
+  accent-color: var(--color-ink);
+}
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+  border-left: 3px solid var(--color-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+  border: 3px solid var(--color-paper);
+}
+
+/**
+ * The audio element keeps its native controls — they are the most reliable
+ * accessible transport we can offer — but gets an outline so it belongs.
+ */
+audio {
+  width: 100%;
+  border: 3px solid var(--color-ink);
+  background-color: var(--color-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  .nb-press:hover:not(:disabled),
+  .nb-press:active:not(:disabled) {
+    transform: none;
+  }
 }
