@@ -3,6 +3,17 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  /**
+   * Served as a Next.js multi-zone under the portfolio domain, at
+   * `joylism.com/asrtranscriber`. The prefix has to live here rather than only
+   * in the proxy: without it this app would request `/_next/static/...` at the
+   * domain root, where the portfolio would try to serve its own bundle.
+   *
+   * Consequence for local work: the dev server serves
+   * http://localhost:3000/asrtranscriber, not `/`.
+   */
+  basePath: "/asrtranscriber",
+
   // This repo lives beside unrelated projects, so pin tracing to itself instead
   // of letting Next.js walk up and find a stray lockfile.
   outputFileTracingRoot: import.meta.dirname,

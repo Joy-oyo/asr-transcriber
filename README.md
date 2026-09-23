@@ -56,26 +56,30 @@ Then open <http://localhost:3000>.
 
 ## Deploying
 
-This ships as its own Vercel project rather than as a route inside a larger site,
-for two concrete reasons:
-
-- The cross-origin isolation headers below apply to the whole origin. On a shared
-  origin they would block any cross-origin image or script that does not opt in
-  with CORP.
-- Model weights, the worker bundle, and the framework version can move
-  independently of whatever links to this demo.
+This ships as its own Vercel project, then gets stitched into the portfolio
+domain at `joylism.com/asrtranscriber` as a
+[Next.js multi-zone](https://nextjs.org/docs/app/guides/multi-zones): the
+portfolio rewrites that path prefix to this deployment. Two repositories, two
+builds, one URL space.
 
 Setup:
 
 1. Import the repository on Vercel. Root directory is the repo root; the preset
    is detected as Next.js.
 2. No environment variables are needed — there is no backend and no API key.
-3. Add the custom domain (e.g. a `asr.` subdomain) in **Settings → Domains**.
+3. In the portfolio project, set `ASR_DEMO_ORIGIN` to this deployment's origin
+   (e.g. `https://asr-transcriber.vercel.app`) and redeploy it.
 
-The response headers in `next.config.ts` are applied by Vercel automatically, so
-`SharedArrayBuffer` and multi-threaded WASM work in production without extra
-configuration. Static hosts that cannot set headers (GitHub Pages, plain S3)
-will still run the demo, but single-threaded and noticeably slower.
+Notes:
+
+- `basePath` is `/asrtranscriber`, so this app also lives under that prefix on
+  its own Vercel URL, and locally at
+  <http://localhost:3000/asrtranscriber>.
+- The response headers in `next.config.ts` are applied by Vercel and pass
+  through the portfolio's proxy. Worth verifying once after the first deploy:
+  if they don't survive, inference still runs, just single-threaded.
+- Static hosts that cannot set headers (GitHub Pages, plain S3) will also run
+  the demo, single-threaded.
 
 ## Notes on the setup
 
