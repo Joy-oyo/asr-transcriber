@@ -38,7 +38,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)",
+        // `/:path*` (not `/(.*)`): basePath is auto-prepended to header
+        // sources, so the pattern must also match the bare basePath root —
+        // `/(.*)` becomes `/asrtranscriber/(.*)`, which never matches
+        // `/asrtranscriber` itself and the page loses COOP/COEP.
+        source: "/:path*",
         headers: [
           // Required for SharedArrayBuffer, which ONNX Runtime Web uses for
           // multi-threaded WASM inference. Without these the model still runs,
